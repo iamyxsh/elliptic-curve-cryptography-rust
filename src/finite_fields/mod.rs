@@ -11,7 +11,7 @@ impl FiniteFieldTrait for FiniteField {
     }
 
     fn multiply(c: &BigUint, d: &BigUint, p: &BigUint) -> BigUint {
-        todo!()
+        (c * d).modpow(&BigUint::from(1u32), p)
     }
 
     fn addition_inverse(c: &BigUint, d: &BigUint) -> BigUint {
@@ -35,5 +35,15 @@ mod tests {
 
         let res = FiniteField::addition(&c, &d, &p);
         assert_eq!(res, BigUint::from(3u32));
+    }
+
+    #[test]
+    fn test_multiplication() {
+        let c = BigUint::from(4u32);
+        let d = BigUint::from(10u32);
+        let p = BigUint::from(31u32);
+
+        let res = FiniteField::multiply(&c, &d, &p);
+        assert_eq!(res, BigUint::from(9u32));
     }
 }
