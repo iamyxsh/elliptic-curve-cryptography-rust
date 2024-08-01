@@ -1,7 +1,8 @@
 pub mod finite_field_trait;
 
-use crate::finite_fields::finite_field_trait::FiniteFieldTrait;
+use crate::finite_fields::finite_field_trait::{FieldError, FiniteFieldTrait};
 use num_bigint::BigUint;
+use num_traits::ops::checked::CheckedSub;
 
 pub struct FiniteField {}
 
@@ -14,8 +15,9 @@ impl FiniteFieldTrait for FiniteField {
         (c * d).modpow(&BigUint::from(1u32), p)
     }
 
-    fn addition_inverse(c: &BigUint, d: &BigUint) -> BigUint {
-        todo!()
+    fn addition_inverse(c: &BigUint, d: &BigUint) -> Result<BigUint, FieldError> {
+        c.checked_sub(d)
+            .ok_or_else(|| FieldError::Underflow(c.clone(), d.clone()))
     }
 
     fn multiply_inverse(c: &BigUint, d: &BigUint) -> BigUint {
@@ -45,5 +47,29 @@ mod tests {
 
         let res = FiniteField::multiply(&c, &d, &p);
         assert_eq!(res, BigUint::from(9u32));
+    }
+
+    #[test]
+    fn test_addition_inverse() {
+        let c = BigUint::from(10u32);
+        let d = BigUint::from(5u32);
+
+        let res = FiniteField::addition_inverse(&c, &d).unwrap();
+
+        assert_eq!(res, BigUint::from(5u32));
+    }
+
+    #[test]
+    fn test_addition_inverse_negative() {
+        let c = BigUint::from(5u32);
+        let d = BigUint::from(10u32);
+
+        let err = FiniteField::addition_inverse(&c, &d).unwrap_err();
+        match err {
+            FieldError::Underflow(a, b) => {
+                assert_eq!(a, c);
+                assert_eq!(b, d);
+            }
+        }
     }
 }
