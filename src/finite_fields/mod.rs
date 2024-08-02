@@ -20,8 +20,9 @@ impl FiniteFieldTrait for FiniteField {
             .ok_or_else(|| FieldError::Underflow(c.clone(), d.clone()))
     }
 
-    fn multiply_inverse(c: &BigUint, d: &BigUint) -> BigUint {
-        todo!()
+    fn multiply_inverse(c: &BigUint, p: &BigUint) -> Result<BigUint, FieldError> {
+        // TODO - check if p is prime
+        Ok(c.modpow(&(p - BigUint::from(2u32)), p))
     }
 }
 
@@ -70,6 +71,16 @@ mod tests {
                 assert_eq!(a, c);
                 assert_eq!(b, d);
             }
+            _ => panic!(),
         }
+    }
+
+    #[test]
+    fn test_multiply_inverse() {
+        let c = BigUint::from(3u32);
+        let p = BigUint::from(7u32);
+
+        let res = FiniteField::multiply_inverse(&c, &p).unwrap();
+        assert_eq!(res, BigUint::from(5u32));
     }
 }
