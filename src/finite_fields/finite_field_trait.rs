@@ -5,6 +5,7 @@ pub trait FiniteFieldTrait {
     fn addition(c: &BigUint, d: &BigUint, p: &BigUint) -> BigUint;
     fn multiply(c: &BigUint, d: &BigUint, p: &BigUint) -> BigUint;
     fn addition_inverse(c: &BigUint, d: &BigUint) -> Result<BigUint, FieldError>;
+    fn substract(c: &BigUint, d: &BigUint, p: &BigUint) -> Result<BigUint, FieldError>;
     fn multiply_inverse(c: &BigUint, p: &BigUint) -> Result<BigUint, FieldError>;
 }
 

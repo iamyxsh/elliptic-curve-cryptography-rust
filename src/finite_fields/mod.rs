@@ -24,11 +24,23 @@ impl FiniteFieldTrait for FiniteField {
         // TODO - check if p is prime
         Ok(c.modpow(&(p - BigUint::from(2u32)), p))
     }
+
+    fn substract(c: &BigUint, d: &BigUint, p: &BigUint) -> Result<BigUint, FieldError> {
+        let res = match FiniteField::addition_inverse(d, p) {
+            Ok(r) => r,
+            Err(err) => return Err(err),
+        };
+        Ok(FiniteField::addition(c, &res, p))
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn mod_add(a: &BigUint, b: &BigUint, m: &BigUint) -> BigUint {
+        (a + b) % m
+    }
 
     #[test]
     fn test_addition() {
@@ -82,5 +94,16 @@ mod tests {
 
         let res = FiniteField::multiply_inverse(&c, &p).unwrap();
         assert_eq!(res, BigUint::from(5u32));
+    }
+
+    fn test_substract_success_when_d_ge_p() {
+        let c = BigUint::from(5u32);
+        let d = BigUint::from(10u32);
+        let p = BigUint::from(7u32);
+
+        let res = FiniteField::substract(&c, &d, &p).unwrap();
+        let expected = mod_add(&c, &(d.clone() - p.clone()), &p);
+        assert_eq!(res, expected);
+        assert_eq!(res, BigUint::from(1u32));
     }
 }
